@@ -1,8 +1,23 @@
 "use client";
 
 import { ArrowRight, CheckCircle2, Database, FolderUp, Server, ShieldCheck } from "lucide-react";
+import type { PlatformSnapshot } from "@/lib/platform-types";
 
-export function InventorySyncTab() {
+type InventorySyncTabProps = {
+  data: PlatformSnapshot;
+};
+
+function getStatusLabel(status: string): string {
+  if (status === "success") return "Sincronização ativa";
+  if (status === "running") return "Processando";
+  if (status === "warning") return "Atenção";
+  if (status === "failed") return "Erro";
+  return "Em fila";
+}
+
+export function InventorySyncTab({ data }: InventorySyncTabProps) {
+  const latestJob = data.syncJobs[0] ?? null;
+
   return (
     <section className="space-y-5">
       <div className="grid gap-4 xl:grid-cols-2">
@@ -83,13 +98,36 @@ export function InventorySyncTab() {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Status de sincronização</p>
-            <h4 className="mt-1 text-lg font-semibold text-white">Última atualização em 08/31 às 15:42</h4>
+            <h4 className="mt-1 text-lg font-semibold text-white">
+              Última atualização em {latestJob ? new Date(latestJob.startedAt).toLocaleString("pt-BR") : "sem registro"}
+            </h4>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-[#68ddbd]/20 bg-[#68ddbd]/10 px-3 py-1.5 text-xs font-medium text-[#68ddbd]">
             <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#68ddbd]" />
-            Sincronização ativa
+            {latestJob ? getStatusLabel(latestJob.status) : "Sincronização ativa"}
           </span>
         </div>
+
+        {latestJob && (
+          <div className="mt-4 grid gap-3 md:grid-cols-4">
+            <div className="rounded-xl bg-[#111b22] p-3">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Fonte</p>
+              <p className="mt-1 text-sm font-semibold text-white">{latestJob.source}</p>
+            </div>
+            <div className="rounded-xl bg-[#111b22] p-3">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Tipo</p>
+              <p className="mt-1 text-sm font-semibold text-white">{latestJob.kind}</p>
+            </div>
+            <div className="rounded-xl bg-[#111b22] p-3">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Processados</p>
+              <p className="mt-1 text-sm font-semibold text-white">{latestJob.recordsProcessed}</p>
+            </div>
+            <div className="rounded-xl bg-[#111b22] p-3">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Rejeitados</p>
+              <p className="mt-1 text-sm font-semibold text-white">{latestJob.recordsRejected}</p>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

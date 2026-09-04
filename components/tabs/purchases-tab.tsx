@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import { ShoppingCart, Truck, CalendarClock } from "lucide-react";
-import { mockPurchases, type Purchase } from "@/data/mock-purchases";
+import type { Purchase } from "@/data/mock-purchases";
 import { PurchaseHistoryChart } from "@/components/charts/purchase-history-chart";
+import type { PlatformSnapshot } from "@/lib/platform-types";
 
 type PurchaseSubTab = "historico" | "agendadas";
+type PurchasesTabProps = {
+  data: PlatformSnapshot;
+};
 
 const statusConfig: Record<Purchase["status"], { label: string; className: string }> = {
   entregue: { label: "Entregue", className: "border border-[#68ddbd]/20 bg-[#68ddbd]/10 text-[#68ddbd]" },
@@ -13,20 +17,11 @@ const statusConfig: Record<Purchase["status"], { label: string; className: strin
   agendada: { label: "Agendada", className: "border border-[#f3c96d]/20 bg-[#f3c96d]/10 text-[#f3c96d]" },
 };
 
-const chartData = [
-  { month: "Jan", value: 28400, items: 3 },
-  { month: "Fev", value: 31200, items: 4 },
-  { month: "Mar", value: 29800, items: 3 },
-  { month: "Abr", value: 35100, items: 5 },
-  { month: "Mai", value: 42350, items: 5 },
-  { month: "Jun", value: 38200, items: 5 },
-];
-
-export function PurchasesTab() {
+export function PurchasesTab({ data }: PurchasesTabProps) {
   const [subTab, setSubTab] = useState<PurchaseSubTab>("historico");
 
-  const delivered = mockPurchases.filter((p) => p.status === "entregue");
-  const scheduled = mockPurchases.filter((p) => p.status === "agendada" || p.status === "em_transito");
+  const delivered = data.purchases.filter((p) => p.status === "entregue");
+  const scheduled = data.purchases.filter((p) => p.status === "agendada" || p.status === "em_transito");
 
   const subTabItems: { key: PurchaseSubTab; label: string; icon: typeof ShoppingCart }[] = [
     { key: "historico", label: "Histórico", icon: ShoppingCart },
@@ -35,18 +30,17 @@ export function PurchasesTab() {
 
   return (
     <section className="space-y-5">
-      <PurchaseHistoryChart data={chartData} />
+      <PurchaseHistoryChart data={data.dashboard.purchaseHistory} />
 
       <div className="flex w-fit gap-2 rounded-md bg-[#0d1117] p-2 shadow-[0_8px_18px_rgba(0,0,0,0.12)]">
         {subTabItems.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setSubTab(key)}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium transition-all duration-150 ${
-              subTab === key
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium transition-all duration-150 ${subTab === key
                 ? "bg-[#68ddbd] text-[#08110f]"
                 : "text-slate-300 hover:bg-[#111b22] hover:text-white"
-            }`}
+              }`}
           >
             <Icon className="h-4 w-4" />
             {label}

@@ -1,0 +1,759 @@
+{
+  "units": [
+    {
+      "id": "hospital-central",
+      "name": "Hospital Central",
+      "companyId": "rede-saude",
+      "companyName": "Rede Saúde Brasil",
+      "location": "Centro, São Paulo",
+      "type": "hospital",
+      "beds": 320,
+      "occupancyRate": 84
+    },
+    {
+      "id": "hospital-norte",
+      "name": "Hospital Norte",
+      "companyId": "rede-saude",
+      "companyName": "Rede Saúde Brasil",
+      "location": "Zona Norte, São Paulo",
+      "type": "hospital",
+      "beds": 210,
+      "occupancyRate": 71
+    },
+    {
+      "id": "hospital-sul",
+      "name": "Hospital Sul",
+      "companyId": "rede-saude",
+      "companyName": "Rede Saúde Brasil",
+      "location": "Zona Sul, São Paulo",
+      "type": "hospital",
+      "beds": 185,
+      "occupancyRate": 68
+    },
+    {
+      "id": "upa-leste",
+      "name": "UPA Leste",
+      "companyId": "rede-saude",
+      "companyName": "Rede Saúde Brasil",
+      "location": "Zona Leste, São Paulo",
+      "type": "hospital",
+      "beds": 80,
+      "occupancyRate": 92
+    },
+    {
+      "id": "farmacia-vida-centro",
+      "name": "Farmácia Vida Centro",
+      "companyId": "farmacia-vida",
+      "companyName": "Farmácia Vida",
+      "location": "Centro, São Paulo",
+      "type": "farmacia",
+      "beds": 0,
+      "occupancyRate": 0
+    },
+    {
+      "id": "farmacia-vida-norte",
+      "name": "Farmácia Vida Norte",
+      "companyId": "farmacia-vida",
+      "companyName": "Farmácia Vida",
+      "location": "Zona Norte, São Paulo",
+      "type": "farmacia",
+      "beds": 0,
+      "occupancyRate": 0
+    },
+    {
+      "id": "drogaria-mais",
+      "name": "Drogaria Mais",
+      "companyId": "drogaria-mais",
+      "companyName": "Drogaria Mais",
+      "location": "Vila Mariana, São Paulo",
+      "type": "farmacia",
+      "beds": 0,
+      "occupancyRate": 0
+    }
+  ],
+  "medicines": [
+    {
+      "id": "med-001",
+      "name": "Ceftriaxona 1g",
+      "batch": "CTR-2026-07A",
+      "category": "Antibióticos",
+      "expiryDate": "2026-06-12",
+      "currentStock": 420,
+      "forecastConsumption": 540,
+      "actualConsumption": 510,
+      "shortageRisk": 86,
+      "financialRisk": 22400,
+      "leadTimeDays": 10
+    },
+    {
+      "id": "med-002",
+      "name": "Meropenem 500mg",
+      "batch": "MRP-2026-05C",
+      "category": "Antibióticos",
+      "expiryDate": "2026-08-01",
+      "currentStock": 260,
+      "forecastConsumption": 390,
+      "actualConsumption": 402,
+      "shortageRisk": 79,
+      "financialRisk": 18400,
+      "leadTimeDays": 14
+    },
+    {
+      "id": "med-003",
+      "name": "Dipirona 1g",
+      "batch": "DIP-2026-11B",
+      "category": "Analgésicos",
+      "expiryDate": "2026-12-30",
+      "currentStock": 3300,
+      "forecastConsumption": 1700,
+      "actualConsumption": 1650,
+      "shortageRisk": 22,
+      "financialRisk": 5100,
+      "leadTimeDays": 5
+    },
+    {
+      "id": "med-004",
+      "name": "Morfina 10mg",
+      "batch": "MOR-2026-04D",
+      "category": "Analgésicos",
+      "expiryDate": "2026-05-20",
+      "currentStock": 110,
+      "forecastConsumption": 280,
+      "actualConsumption": 310,
+      "shortageRisk": 92,
+      "financialRisk": 14600,
+      "leadTimeDays": 7
+    },
+    {
+      "id": "med-005",
+      "name": "Paclitaxel 100mg",
+      "batch": "PCT-2026-09F",
+      "category": "Oncológicos",
+      "expiryDate": "2026-09-10",
+      "currentStock": 85,
+      "forecastConsumption": 140,
+      "actualConsumption": 132,
+      "shortageRisk": 67,
+      "financialRisk": 36700,
+      "leadTimeDays": 18
+    },
+    {
+      "id": "med-006",
+      "name": "Doxorrubicina 50mg",
+      "batch": "DOX-2026-10E",
+      "category": "Oncológicos",
+      "expiryDate": "2026-10-18",
+      "currentStock": 76,
+      "forecastConsumption": 120,
+      "actualConsumption": 118,
+      "shortageRisk": 64,
+      "financialRisk": 34900,
+      "leadTimeDays": 20
+    },
+    {
+      "id": "med-007",
+      "name": "Enoxaparina 40mg",
+      "batch": "ENX-2026-07G",
+      "category": "Cardiológicos",
+      "expiryDate": "2026-07-28",
+      "currentStock": 980,
+      "forecastConsumption": 900,
+      "actualConsumption": 870,
+      "shortageRisk": 41,
+      "financialRisk": 9800,
+      "leadTimeDays": 8
+    },
+    {
+      "id": "med-008",
+      "name": "Amiodarona 200mg",
+      "batch": "AMD-2026-06H",
+      "category": "Cardiológicos",
+      "expiryDate": "2026-06-06",
+      "currentStock": 160,
+      "forecastConsumption": 250,
+      "actualConsumption": 240,
+      "shortageRisk": 81,
+      "financialRisk": 15200,
+      "leadTimeDays": 12
+    },
+    {
+      "id": "med-009",
+      "name": "Propofol 10mg/ml",
+      "batch": "PRF-2026-06I",
+      "category": "Anestésicos",
+      "expiryDate": "2026-06-01",
+      "currentStock": 190,
+      "forecastConsumption": 370,
+      "actualConsumption": 392,
+      "shortageRisk": 88,
+      "financialRisk": 20100,
+      "leadTimeDays": 9
+    },
+    {
+      "id": "med-010",
+      "name": "Midazolam 5mg",
+      "batch": "MDZ-2026-09J",
+      "category": "Anestésicos",
+      "expiryDate": "2026-09-21",
+      "currentStock": 530,
+      "forecastConsumption": 500,
+      "actualConsumption": 520,
+      "shortageRisk": 48,
+      "financialRisk": 11300,
+      "leadTimeDays": 8
+    }
+  ],
+  "unitStocks": [
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-001",
+      "currentStock": 180,
+      "forecastConsumption": 200
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-002",
+      "currentStock": 90,
+      "forecastConsumption": 140
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-003",
+      "currentStock": 1400,
+      "forecastConsumption": 700
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-004",
+      "currentStock": 40,
+      "forecastConsumption": 110
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-005",
+      "currentStock": 35,
+      "forecastConsumption": 55
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-006",
+      "currentStock": 30,
+      "forecastConsumption": 46
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-007",
+      "currentStock": 420,
+      "forecastConsumption": 360
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-008",
+      "currentStock": 60,
+      "forecastConsumption": 100
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-009",
+      "currentStock": 70,
+      "forecastConsumption": 150
+    },
+    {
+      "unitId": "hospital-central",
+      "medicineId": "med-010",
+      "currentStock": 220,
+      "forecastConsumption": 200
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-001",
+      "currentStock": 120,
+      "forecastConsumption": 130
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-002",
+      "currentStock": 95,
+      "forecastConsumption": 80
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-003",
+      "currentStock": 900,
+      "forecastConsumption": 550
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-004",
+      "currentStock": 35,
+      "forecastConsumption": 90
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-005",
+      "currentStock": 28,
+      "forecastConsumption": 40
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-006",
+      "currentStock": 22,
+      "forecastConsumption": 35
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-007",
+      "currentStock": 310,
+      "forecastConsumption": 280
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-008",
+      "currentStock": 55,
+      "forecastConsumption": 75
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-009",
+      "currentStock": 65,
+      "forecastConsumption": 110
+    },
+    {
+      "unitId": "hospital-norte",
+      "medicineId": "med-010",
+      "currentStock": 180,
+      "forecastConsumption": 150
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-001",
+      "currentStock": 75,
+      "forecastConsumption": 110
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-002",
+      "currentStock": 40,
+      "forecastConsumption": 80
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-003",
+      "currentStock": 650,
+      "forecastConsumption": 300
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-004",
+      "currentStock": 20,
+      "forecastConsumption": 55
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-005",
+      "currentStock": 14,
+      "forecastConsumption": 28
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-006",
+      "currentStock": 14,
+      "forecastConsumption": 24
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-007",
+      "currentStock": 180,
+      "forecastConsumption": 160
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-008",
+      "currentStock": 30,
+      "forecastConsumption": 50
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-009",
+      "currentStock": 35,
+      "forecastConsumption": 65
+    },
+    {
+      "unitId": "hospital-sul",
+      "medicineId": "med-010",
+      "currentStock": 95,
+      "forecastConsumption": 100
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-001",
+      "currentStock": 45,
+      "forecastConsumption": 100
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-002",
+      "currentStock": 35,
+      "forecastConsumption": 90
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-003",
+      "currentStock": 350,
+      "forecastConsumption": 150
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-004",
+      "currentStock": 15,
+      "forecastConsumption": 25
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-005",
+      "currentStock": 8,
+      "forecastConsumption": 17
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-006",
+      "currentStock": 10,
+      "forecastConsumption": 15
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-007",
+      "currentStock": 70,
+      "forecastConsumption": 100
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-008",
+      "currentStock": 15,
+      "forecastConsumption": 25
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-009",
+      "currentStock": 20,
+      "forecastConsumption": 45
+    },
+    {
+      "unitId": "upa-leste",
+      "medicineId": "med-010",
+      "currentStock": 35,
+      "forecastConsumption": 50
+    },
+    {
+      "unitId": "farmacia-vida-centro",
+      "medicineId": "med-001",
+      "currentStock": 220,
+      "forecastConsumption": 120
+    },
+    {
+      "unitId": "farmacia-vida-centro",
+      "medicineId": "med-003",
+      "currentStock": 210,
+      "forecastConsumption": 130
+    },
+    {
+      "unitId": "farmacia-vida-centro",
+      "medicineId": "med-006",
+      "currentStock": 120,
+      "forecastConsumption": 60
+    },
+    {
+      "unitId": "farmacia-vida-norte",
+      "medicineId": "med-002",
+      "currentStock": 180,
+      "forecastConsumption": 90
+    },
+    {
+      "unitId": "farmacia-vida-norte",
+      "medicineId": "med-007",
+      "currentStock": 140,
+      "forecastConsumption": 75
+    },
+    {
+      "unitId": "drogaria-mais",
+      "medicineId": "med-001",
+      "currentStock": 50,
+      "forecastConsumption": 140
+    },
+    {
+      "unitId": "drogaria-mais",
+      "medicineId": "med-003",
+      "currentStock": 60,
+      "forecastConsumption": 170
+    },
+    {
+      "unitId": "drogaria-mais",
+      "medicineId": "med-006",
+      "currentStock": 25,
+      "forecastConsumption": 90
+    },
+    {
+      "unitId": "drogaria-mais",
+      "medicineId": "med-007",
+      "currentStock": 35,
+      "forecastConsumption": 110
+    }
+  ],
+  "transfers": [
+    {
+      "id": "trf-001",
+      "fromUnitId": "hospital-central",
+      "toUnitId": "upa-leste",
+      "medicineId": "med-001",
+      "medicineName": "Ceftriaxona 1g",
+      "quantity": 80,
+      "status": "concluída",
+      "date": "2025-06-02",
+      "requestedBy": "Dr. Carlos Mendes"
+    },
+    {
+      "id": "trf-002",
+      "fromUnitId": "hospital-norte",
+      "toUnitId": "hospital-sul",
+      "medicineId": "med-003",
+      "medicineName": "Dipirona 1g",
+      "quantity": 200,
+      "status": "concluída",
+      "date": "2025-06-05",
+      "requestedBy": "Enf. Ana Souza"
+    },
+    {
+      "id": "trf-003",
+      "fromUnitId": "hospital-central",
+      "toUnitId": "hospital-sul",
+      "medicineId": "med-009",
+      "medicineName": "Propofol 10mg/ml",
+      "quantity": 30,
+      "status": "aprovada",
+      "date": "2025-06-08",
+      "requestedBy": "Dr. Paulo Lima"
+    },
+    {
+      "id": "trf-004",
+      "fromUnitId": "hospital-norte",
+      "toUnitId": "upa-leste",
+      "medicineId": "med-002",
+      "medicineName": "Meropenem 500mg",
+      "quantity": 40,
+      "status": "pendente",
+      "date": "2025-06-10",
+      "requestedBy": "Dra. Marina Costa"
+    },
+    {
+      "id": "trf-005",
+      "fromUnitId": "hospital-central",
+      "toUnitId": "upa-leste",
+      "medicineId": "med-004",
+      "medicineName": "Morfina 10mg",
+      "quantity": 20,
+      "status": "pendente",
+      "date": "2025-06-11",
+      "requestedBy": "Dr. Roberto Ferreira"
+    },
+    {
+      "id": "trf-006",
+      "fromUnitId": "hospital-sul",
+      "toUnitId": "hospital-norte",
+      "medicineId": "med-010",
+      "medicineName": "Midazolam 5mg",
+      "quantity": 50,
+      "status": "concluída",
+      "date": "2025-05-28",
+      "requestedBy": "Enf. João Alves"
+    },
+    {
+      "id": "trf-007",
+      "fromUnitId": "hospital-norte",
+      "toUnitId": "hospital-sul",
+      "medicineId": "med-007",
+      "medicineName": "Enoxaparina 40mg",
+      "quantity": 100,
+      "status": "aprovada",
+      "date": "2025-06-09",
+      "requestedBy": "Dr. Lucas Gomes"
+    },
+    {
+      "id": "trf-008",
+      "fromUnitId": "hospital-central",
+      "toUnitId": "hospital-norte",
+      "medicineId": "med-008",
+      "medicineName": "Amiodarona 200mg",
+      "quantity": 25,
+      "status": "pendente",
+      "date": "2025-06-12",
+      "requestedBy": "Dra. Fernanda Torres"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "prc-001",
+      "medicineId": "med-001",
+      "medicineName": "Ceftriaxona 1g",
+      "quantity": 500,
+      "unitPrice": 18.5,
+      "totalValue": 9250,
+      "supplier": "FarmaSupply Brasil",
+      "status": "entregue",
+      "orderDate": "2025-05-01",
+      "deliveryDate": "2025-05-12",
+      "unitId": "hospital-central"
+    },
+    {
+      "id": "prc-002",
+      "medicineId": "med-004",
+      "medicineName": "Morfina 10mg",
+      "quantity": 300,
+      "unitPrice": 42,
+      "totalValue": 12600,
+      "supplier": "MediLog Distribuidora",
+      "status": "entregue",
+      "orderDate": "2025-05-03",
+      "deliveryDate": "2025-05-11",
+      "unitId": "hospital-central"
+    },
+    {
+      "id": "prc-003",
+      "medicineId": "med-009",
+      "medicineName": "Propofol 10mg/ml",
+      "quantity": 400,
+      "unitPrice": 38,
+      "totalValue": 15200,
+      "supplier": "VidaFarma SP",
+      "status": "entregue",
+      "orderDate": "2025-05-06",
+      "deliveryDate": "2025-05-16",
+      "unitId": "hospital-norte"
+    },
+    {
+      "id": "prc-004",
+      "medicineId": "med-005",
+      "medicineName": "Paclitaxel 100mg",
+      "quantity": 100,
+      "unitPrice": 210,
+      "totalValue": 21000,
+      "supplier": "OncoPharma Ltda",
+      "status": "entregue",
+      "orderDate": "2025-05-10",
+      "deliveryDate": "2025-05-29",
+      "unitId": "hospital-central"
+    },
+    {
+      "id": "prc-005",
+      "medicineId": "med-008",
+      "medicineName": "Amiodarona 200mg",
+      "quantity": 200,
+      "unitPrice": 28,
+      "totalValue": 5600,
+      "supplier": "CardioMed Distribuidora",
+      "status": "entregue",
+      "orderDate": "2025-05-12",
+      "deliveryDate": "2025-05-25",
+      "unitId": "hospital-sul"
+    },
+    {
+      "id": "prc-006",
+      "medicineId": "med-002",
+      "medicineName": "Meropenem 500mg",
+      "quantity": 350,
+      "unitPrice": 32,
+      "totalValue": 11200,
+      "supplier": "FarmaSupply Brasil",
+      "status": "em_transito",
+      "orderDate": "2025-06-01",
+      "deliveryDate": "2025-06-16",
+      "unitId": "hospital-central"
+    },
+    {
+      "id": "prc-007",
+      "medicineId": "med-006",
+      "medicineName": "Doxorrubicina 50mg",
+      "quantity": 80,
+      "unitPrice": 180,
+      "totalValue": 14400,
+      "supplier": "OncoPharma Ltda",
+      "status": "em_transito",
+      "orderDate": "2025-06-03",
+      "deliveryDate": "2025-06-24",
+      "unitId": "hospital-norte"
+    },
+    {
+      "id": "prc-008",
+      "medicineId": "med-003",
+      "medicineName": "Dipirona 1g",
+      "quantity": 2000,
+      "unitPrice": 1.8,
+      "totalValue": 3600,
+      "supplier": "MediLog Distribuidora",
+      "status": "agendada",
+      "orderDate": "2025-06-15",
+      "deliveryDate": "2025-06-21",
+      "unitId": "hospital-sul"
+    },
+    {
+      "id": "prc-009",
+      "medicineId": "med-007",
+      "medicineName": "Enoxaparina 40mg",
+      "quantity": 600,
+      "unitPrice": 14.5,
+      "totalValue": 8700,
+      "supplier": "CardioMed Distribuidora",
+      "status": "agendada",
+      "orderDate": "2025-06-18",
+      "deliveryDate": "2025-06-27",
+      "unitId": "hospital-central"
+    },
+    {
+      "id": "prc-010",
+      "medicineId": "med-010",
+      "medicineName": "Midazolam 5mg",
+      "quantity": 300,
+      "unitPrice": 22,
+      "totalValue": 6600,
+      "supplier": "VidaFarma SP",
+      "status": "agendada",
+      "orderDate": "2025-06-20",
+      "deliveryDate": "2025-06-29",
+      "unitId": "upa-leste"
+    }
+  ],
+  "syncJobs": [
+    {
+      "id": "sync-001",
+      "source": "ERP",
+      "kind": "importacao",
+      "status": "success",
+      "startedAt": "2026-09-04T15:10:00.000Z",
+      "finishedAt": "2026-09-04T15:42:00.000Z",
+      "recordsProcessed": 1842,
+      "recordsRejected": 3,
+      "message": "Importação reconciliada com sucesso."
+    },
+    {
+      "id": "sync-002",
+      "source": "Planilha",
+      "kind": "reconciliacao",
+      "status": "warning",
+      "startedAt": "2026-09-03T08:20:00.000Z",
+      "finishedAt": "2026-09-03T08:35:00.000Z",
+      "recordsProcessed": 128,
+      "recordsRejected": 9,
+      "message": "9 linhas exigiram ajuste manual de unidade e medicamento."
+    },
+    {
+      "id": "sync-003",
+      "source": "SFTP",
+      "kind": "previsao",
+      "status": "running",
+      "startedAt": "2026-09-04T15:50:00.000Z",
+      "finishedAt": null,
+      "recordsProcessed": 0,
+      "recordsRejected": 0,
+      "message": "Rodando recalculo de forecast e risco por unidade."
+    }
+  ]
+}

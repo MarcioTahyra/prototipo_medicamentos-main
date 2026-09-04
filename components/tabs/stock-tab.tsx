@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { Boxes } from "lucide-react";
-import { mockMedicines, type MedicineItem } from "@/data/mock-medicines";
-import { mockUnits, mockUnitStocks } from "@/data/mock-units";
+import type { MedicineItem } from "@/data/mock-medicines";
 import { StockLevelChart } from "@/components/charts/stock-level-chart";
+import type { PlatformSnapshot } from "@/lib/platform-types";
 
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 const EXPIRING_FILTER_DAYS = 45;
@@ -33,39 +33,40 @@ function getRupturaClass(days: number): string {
 }
 
 type StockTabProps = {
+  data: PlatformSnapshot;
   selectedUnitId: string;
 };
 
-export function StockTab({ selectedUnitId }: StockTabProps) {
+export function StockTab({ data, selectedUnitId }: StockTabProps) {
   const [expiringSoonFilter, setExpiringSoonFilter] = useState(false);
   const [lowStockFilter, setLowStockFilter] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState<MedicineItem | null>(null);
 
   const chartData = useMemo(() => {
     if (selectedUnitId === "all") {
-      return mockMedicines.map((m) => ({
+      return data.medicines.map((m) => ({
         name: m.name,
         currentStock: m.currentStock,
         forecastConsumption: m.forecastConsumption,
       }));
     }
-    return mockUnitStocks
+    return data.unitStocks
       .filter((s) => s.unitId === selectedUnitId)
       .map((s) => {
-        const med = mockMedicines.find((m) => m.id === s.medicineId);
+        const med = data.medicines.find((m) => m.id === s.medicineId);
         return {
           name: med?.name ?? s.medicineId,
           currentStock: s.currentStock,
           forecastConsumption: s.forecastConsumption,
         };
       });
-  }, [selectedUnitId]);
+  }, [data.medicines, data.unitStocks, selectedUnitId]);
 
   const filteredMedicines = useMemo(() => {
-    let list = mockMedicines;
+    let list = data.medicines;
     if (selectedUnitId !== "all") {
       const unitStockMap = new Map(
-        mockUnitStocks.filter((s) => s.unitId === selectedUnitId).map((s) => [s.medicineId, s]),
+        data.unitStocks.filter((s) => s.unitId === selectedUnitId).map((s) => [s.medicineId, s]),
       );
       list = list.map((m) => {
         const us = unitStockMap.get(m.id);
@@ -79,12 +80,12 @@ export function StockTab({ selectedUnitId }: StockTabProps) {
       const matchesLowStock = !lowStockFilter || item.currentStock < item.forecastConsumption;
       return matchesExpiring && matchesLowStock;
     });
-  }, [selectedUnitId, expiringSoonFilter, lowStockFilter]);
+  }, [data.medicines, data.unitStocks, expiringSoonFilter, lowStockFilter, selectedUnitId]);
 
   const unitLabel =
     selectedUnitId === "all"
       ? "Todas as Unidades"
-      : mockUnits.find((u) => u.id === selectedUnitId)?.name ?? selectedUnitId;
+      : data.units.find((u) => u.id === selectedUnitId)?.name ?? selectedUnitId;
 
   return (
     <section className="space-y-5">
@@ -98,21 +99,19 @@ export function StockTab({ selectedUnitId }: StockTabProps) {
         <div className="ml-auto flex flex-wrap gap-2">
           <button
             onClick={() => setExpiringSoonFilter((p) => !p)}
-            className={`rounded-full px-3 py-1.5 text-sm transition ${
-              expiringSoonFilter
+            className={`rounded-full px-3 py-1.5 text-sm transition ${expiringSoonFilter
                 ? "bg-[#f3c96d]/15 text-[#f3c96d] ring-1 ring-[#f3c96d]/20"
                 : "bg-[#111b22] text-slate-300 hover:bg-[#162229]"
-            }`}
+              }`}
           >
             Próximos ao Vencimento
           </button>
           <button
             onClick={() => setLowStockFilter((p) => !p)}
-            className={`rounded-full px-3 py-1.5 text-sm transition ${
-              lowStockFilter
+            className={`rounded-full px-3 py-1.5 text-sm transition ${lowStockFilter
                 ? "bg-red-500/10 text-red-200 ring-1 ring-red-500/20"
                 : "bg-[#111b22] text-slate-300 hover:bg-[#162229]"
-            }`}
+              }`}
           >
             Estoque Baixo
           </button>

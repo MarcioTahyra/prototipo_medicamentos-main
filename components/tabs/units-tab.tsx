@@ -2,14 +2,18 @@
 
 import { useMemo, useState } from "react";
 import { Building2, AlertTriangle, BedDouble, Users } from "lucide-react";
-import { mockUnits, mockUnitStocks, type Unit } from "@/data/mock-units";
-import { mockMedicines } from "@/data/mock-medicines";
+import type { Unit, UnitStock } from "@/data/mock-units";
 import { UnitStockComparisonChart } from "@/components/charts/unit-stock-comparison-chart";
+import type { PlatformSnapshot } from "@/lib/platform-types";
+
+type UnitsTabProps = {
+  data: PlatformSnapshot;
+};
 
 const EXCESS_THRESHOLD = 1.4;
 
-function getCriticalCount(unitId: string): number {
-  return mockUnitStocks.filter((s) => {
+function getCriticalCount(unitStocks: UnitStock[], unitId: string): number {
+  return unitStocks.filter((s) => {
     if (s.unitId !== unitId) return false;
     return s.currentStock < s.forecastConsumption;
   }).length;
@@ -25,28 +29,28 @@ function getStockStatus(stock: number, forecast: number) {
   return { label: "Normal", className: "border border-[#68ddbd]/20 bg-[#68ddbd]/10 text-[#68ddbd]" };
 }
 
-export function UnitsTab() {
+export function UnitsTab({ data }: UnitsTabProps) {
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
 
   const comparisonData = useMemo(() => {
-    return mockUnits.map((unit) => {
-      const stocks = mockUnitStocks.filter((s) => s.unitId === unit.id);
+    return data.units.map((unit) => {
+      const stocks = data.unitStocks.filter((s) => s.unitId === unit.id);
       const totalStock = stocks.reduce((a, s) => a + s.currentStock, 0);
       const totalForecast = stocks.reduce((a, s) => a + s.forecastConsumption, 0);
       const excess = Math.max(0, totalStock - totalForecast);
       return { unitName: unit.name, stock: totalStock, forecast: totalForecast, excess };
     });
-  }, []);
+  }, [data.unitStocks, data.units]);
 
   const unitStockRows = useMemo(() => {
     if (!selectedUnit) return [];
-    return mockUnitStocks
+    return data.unitStocks
       .filter((s) => s.unitId === selectedUnit.id)
       .map((s) => {
-        const medicine = mockMedicines.find((m) => m.id === s.medicineId);
+        const medicine = data.medicines.find((m) => m.id === s.medicineId);
         return { ...s, medicineName: medicine?.name ?? s.medicineId, category: medicine?.category ?? "—" };
       });
-  }, [selectedUnit]);
+  }, [data.medicines, data.unitStocks, selectedUnit]);
 
   return (
     <section className="space-y-5">
@@ -60,18 +64,17 @@ export function UnitsTab() {
       <UnitStockComparisonChart data={comparisonData} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {mockUnits.map((unit) => {
-          const criticalCount = getCriticalCount(unit.id);
+        {data.units.map((unit) => {
+          const criticalCount = getCriticalCount(data.unitStocks, unit.id);
           const isSelected = selectedUnit?.id === unit.id;
           return (
             <button
               key={unit.id}
               onClick={() => setSelectedUnit(isSelected ? null : unit)}
-              className={`rounded-2xl border p-4 text-left transition ${
-                isSelected
+              className={`rounded-2xl border p-4 text-left transition ${isSelected
                   ? "border-[#68ddbd]/35 bg-[#0f171a]"
                   : "border-white/5 bg-[#10171c] hover:border-white/10"
-              }`}
+                }`}
             >
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">

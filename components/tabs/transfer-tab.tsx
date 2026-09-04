@@ -2,10 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { ArrowLeftRight, Plus, X, CheckCircle, Clock, AlertTriangle, MapPin, Building2, PackageCheck, ShieldAlert } from "lucide-react";
-import { mockTransfers, type Transfer } from "@/data/mock-transfers";
-import { mockUnits } from "@/data/mock-units";
-import { mockUnitStocks } from "@/data/mock-units";
-import { mockMedicines } from "@/data/mock-medicines";
+import type { Transfer } from "@/data/mock-transfers";
+import type { PlatformSnapshot } from "@/lib/platform-types";
 
 const EXCESS_THRESHOLD = 1.4;
 type MatchDecision = "accepted" | "rejected" | "ignored";
@@ -36,17 +34,11 @@ const statusConfig: Record<Transfer["status"], { label: string; className: strin
   pendente: { label: "Pendente", className: "border border-[#f3c96d]/20 bg-[#f3c96d]/10 text-[#f3c96d]", icon: Clock },
 };
 
-function getUnitName(id: string) {
-  return mockUnits.find((u) => u.id === id)?.name ?? id;
-}
+type TransferTabProps = { data: PlatformSnapshot };
 
-function getUnitMeta(id: string) {
-  return mockUnits.find((u) => u.id === id) ?? null;
-}
-
-export function TransferTab() {
+export function TransferTab({ data }: TransferTabProps) {
   const [showForm, setShowForm] = useState(false);
-  const [transfers, setTransfers] = useState<Transfer[]>(mockTransfers);
+  const [transfers, setTransfers] = useState<Transfer[]>(data.transfers);
   const [matchDecisions, setMatchDecisions] = useState<Record<string, MatchDecision>>({});
   const [form, setForm] = useState({
     fromUnitId: "",
@@ -58,24 +50,28 @@ export function TransferTab() {
 
   const pending = transfers.filter((t) => t.status === "pendente").length;
 
-  const excessItems = mockUnitStocks
+  const unitsById = new Map(data.units.map((unit) => [unit.id, unit]));
+  const medicinesById = new Map(data.medicines.map((medicine) => [medicine.id, medicine]));
+  const getUnitName = (id: string) => unitsById.get(id)?.name ?? id;
+
+  const excessItems = data.unitStocks
     .filter((s) => s.currentStock > s.forecastConsumption * EXCESS_THRESHOLD)
     .map((s) => ({
       ...s,
-      medicineName: mockMedicines.find((m) => m.id === s.medicineId)?.name ?? s.medicineId,
-      unitName: getUnitName(s.unitId),
-      companyName: getUnitMeta(s.unitId)?.companyName ?? "Empresa vinculada",
-      location: getUnitMeta(s.unitId)?.location ?? "Local",
+      medicineName: medicinesById.get(s.medicineId)?.name ?? s.medicineId,
+      unitName: unitsById.get(s.unitId)?.name ?? s.unitId,
+      companyName: unitsById.get(s.unitId)?.companyName ?? "Empresa vinculada",
+      location: unitsById.get(s.unitId)?.location ?? "Local",
     }));
 
-  const shortageItems = mockUnitStocks
+  const shortageItems = data.unitStocks
     .filter((s) => s.currentStock < s.forecastConsumption)
     .map((s) => ({
       ...s,
-      medicineName: mockMedicines.find((m) => m.id === s.medicineId)?.name ?? s.medicineId,
-      unitName: getUnitName(s.unitId),
-      companyName: getUnitMeta(s.unitId)?.companyName ?? "Empresa vinculada",
-      location: getUnitMeta(s.unitId)?.location ?? "Local",
+      medicineName: medicinesById.get(s.medicineId)?.name ?? s.medicineId,
+      unitName: unitsById.get(s.unitId)?.name ?? s.unitId,
+      companyName: unitsById.get(s.unitId)?.companyName ?? "Empresa vinculada",
+      location: unitsById.get(s.unitId)?.location ?? "Local",
     }));
 
   const matchCandidates = useMemo<MatchCandidate[]>(() => {
@@ -125,21 +121,33 @@ export function TransferTab() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const medicine = mockMedicines.find((m) => m.id === form.medicineId);
-    const newTransfer: Transfer = {
-      id: `trf-${Date.now()}`,
-      fromUnitId: form.fromUnitId,
-      toUnitId: form.toUnitId,
-      medicineId: form.medicineId,
-      medicineName: medicine?.name ?? form.medicineId,
-      quantity: Number(form.quantity),
-      status: "pendente",
-      date: new Date().toISOString().slice(0, 10),
-      requestedBy: form.requestedBy || "Sistema",
-    };
-    setTransfers((prev) => [newTransfer, ...prev]);
-    setShowForm(false);
-    setForm({ fromUnitId: "", toUnitId: "", medicineId: "", quantity: "", requestedBy: "" });
+
+    void (async () => {
+      try {
+        const response = await fetch("/api/transfers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromUnitId: form.fromUnitId,
+            toUnitId: form.toUnitId,
+            medicineId: form.medicineId,
+            quantity: Number(form.quantity),
+            requestedBy: form.requestedBy || "Sistema",
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Falha ao criar a transferência.");
+        }
+
+        const created = (await response.json()) as Transfer;
+        setTransfers((prev) => [created, ...prev]);
+        setShowForm(false);
+        setForm({ fromUnitId: "", toUnitId: "", medicineId: "", quantity: "", requestedBy: "" });
+      } catch {
+        setShowForm(true);
+      }
+    })();
   }
 
   return (
@@ -286,31 +294,28 @@ export function TransferTab() {
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   <button
                     onClick={() => handleDecision(candidate.id, "accepted")}
-                    className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${
-                      decision === "accepted"
+                    className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${decision === "accepted"
                         ? "bg-[#68ddbd] text-[#08110f] shadow-[0_8px_18px_rgba(104,221,189,0.18)]"
                         : "border border-[#68ddbd]/30 bg-[#68ddbd]/10 text-[#68ddbd] hover:bg-[#68ddbd]/15"
-                    }`}
+                      }`}
                   >
                     Aceitar
                   </button>
                   <button
                     onClick={() => handleDecision(candidate.id, "rejected")}
-                    className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${
-                      decision === "rejected"
+                    className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${decision === "rejected"
                         ? "bg-red-500 text-white shadow-[0_8px_18px_rgba(239,68,68,0.18)]"
                         : "border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/15"
-                    }`}
+                      }`}
                   >
                     Negar
                   </button>
                   <button
                     onClick={() => handleDecision(candidate.id, "ignored")}
-                    className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${
-                      decision === "ignored"
+                    className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${decision === "ignored"
                         ? "bg-slate-600 text-white"
                         : "border border-slate-500/30 bg-[#101821] text-slate-300 hover:bg-[#171f27]"
-                    }`}
+                      }`}
                   >
                     Ignorar
                   </button>
@@ -386,7 +391,7 @@ export function TransferTab() {
                   className="w-full rounded-xl border border-[#1b232b] bg-[#111b22] px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#68ddbd]/30"
                 >
                   <option value="">Selecione…</option>
-                  {mockUnits.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  {data.units.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
                 </select>
               </div>
               <div>
@@ -398,7 +403,7 @@ export function TransferTab() {
                   className="w-full rounded-xl border border-[#1b232b] bg-[#111b22] px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#68ddbd]/30"
                 >
                   <option value="">Selecione…</option>
-                  {mockUnits.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  {data.units.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
                 </select>
               </div>
               <div>
@@ -410,7 +415,7 @@ export function TransferTab() {
                   className="w-full rounded-xl border border-[#1b232b] bg-[#111b22] px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#68ddbd]/30"
                 >
                   <option value="">Selecione…</option>
-                  {mockMedicines.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  {data.medicines.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                 </select>
               </div>
               <div>

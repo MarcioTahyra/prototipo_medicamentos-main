@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Activity,
   ArrowLeftRight,
@@ -9,7 +10,7 @@ import {
   ShoppingCart,
   TrendingUp,
 } from "lucide-react";
-import { mockUnits } from "@/data/mock-units";
+import type { PlatformSnapshot } from "@/lib/platform-types";
 import { DashboardTab } from "@/components/tabs/dashboard-tab";
 import { UnitsTab } from "@/components/tabs/units-tab";
 import { TransferTab } from "@/components/tabs/transfer-tab";
@@ -33,16 +34,67 @@ const tabItems: { key: TabKey; label: string; icon: typeof TrendingUp }[] = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabKey>("dashboard");
   const [selectedUnitId, setSelectedUnitId] = useState<string>("all");
+  const [platformData, setPlatformData] = useState<PlatformSnapshot | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadPlatformData() {
+      try {
+        const response = await fetch("/api/platform", { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error("Falha ao carregar a plataforma.");
+        }
+
+        const payload = (await response.json()) as PlatformSnapshot;
+        setPlatformData(payload);
+      } catch (error) {
+        if ((error as Error).name === "AbortError") {
+          return;
+        }
+
+        setLoadError(error instanceof Error ? error.message : "Falha inesperada ao carregar os dados.");
+      }
+    }
+
+    loadPlatformData();
+
+    return () => controller.abort();
+  }, []);
+
+  if (!platformData && !loadError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0b0f12] text-slate-300">
+        Carregando dados da plataforma...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0b0f12] px-6 text-center text-slate-200">
+        <div className="max-w-md rounded-2xl border border-red-500/20 bg-red-500/10 p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-200">Erro de carga</p>
+          <p className="mt-2 text-base text-slate-100">{loadError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const data = platformData as PlatformSnapshot;
 
   return (
     <div className="site-shell min-h-screen text-slate-100">
-      <div className="mx-auto flex max-w-[1700px] flex-col xl:flex-row">
-        <aside className="w-full border-b border-white/5 bg-[#0d1419] px-5 py-5 xl:min-h-screen xl:w-[280px] xl:border-b-0 xl:border-r">
+      <div className="mx-auto flex max-w-screen-2xl flex-col xl:flex-row">
+        <aside className="w-full border-b border-white/5 bg-[#0d1419] px-5 py-5 xl:min-h-screen xl:w-72 xl:border-b-0 xl:border-r">
           <div className="mb-8 flex items-center justify-end gap-3">
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
-              <img
+              <Image
                 src="/logo-synthera.svg"
                 alt="Synthera logo"
+                width={40}
+                height={40}
                 className="h-full w-full object-contain filter brightness-0 invert"
               />
             </div>
@@ -73,11 +125,10 @@ export default function Home() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
-                    isActive
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${isActive
                       ? "bg-[#68ddbd] text-[#07120f]"
                       : "text-slate-300 hover:bg-[#111b22] hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
                   <span>{tab.label}</span>
@@ -96,7 +147,7 @@ export default function Home() {
               className="w-full rounded-xl border border-white/5 bg-[#10181d] px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-[#68ddbd]/45"
             >
               <option value="all">Todas as unidades</option>
-              {mockUnits.map((u) => (
+              {data.units.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.companyName} · {u.name}
                 </option>
@@ -119,12 +170,12 @@ export default function Home() {
             </div>
           </header>
 
-          {activeTab === "dashboard" && <DashboardTab />}
-          {activeTab === "match" && <TransferTab />}
-          {activeTab === "unidades" && <UnitsTab />}
-          {activeTab === "estoque" && <StockTab selectedUnitId={selectedUnitId} />}
-          {activeTab === "sincronizar" && <InventorySyncTab />}
-          {activeTab === "compras" && <PurchasesTab />}
+          {activeTab === "dashboard" && <DashboardTab data={data} />}
+          {activeTab === "match" && <TransferTab data={data} />}
+          {activeTab === "unidades" && <UnitsTab data={data} />}
+          {activeTab === "estoque" && <StockTab data={data} selectedUnitId={selectedUnitId} />}
+          {activeTab === "sincronizar" && <InventorySyncTab data={data} />}
+          {activeTab === "compras" && <PurchasesTab data={data} />}
         </main>
       </div>
     </div>
