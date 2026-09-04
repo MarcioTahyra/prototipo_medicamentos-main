@@ -1,10 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowRight, CheckCircle2, Database, FolderUp, Server, ShieldCheck } from "lucide-react";
 import type { PlatformSnapshot } from "@/lib/platform-types";
 
 type InventorySyncTabProps = {
   data: PlatformSnapshot;
+  onUploadComplete: () => Promise<void>;
+};
+
+type UploadResult = {
+  message: string;
+  processedRows: number;
+  updatedRows: number;
+  createdRows: number;
+  rejectedRows: number;
+  totalRows: number;
 };
 
 function getStatusLabel(status: string): string {
@@ -15,8 +26,50 @@ function getStatusLabel(status: string): string {
   return "Em fila";
 }
 
-export function InventorySyncTab({ data }: InventorySyncTabProps) {
+export function InventorySyncTab({ data, onUploadComplete }: InventorySyncTabProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const latestJob = data.syncJobs[0] ?? null;
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!selectedFile) {
+      setUploadError("Selecione um arquivo CSV ou XLSX antes de enviar.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadError(null);
+    setUploadResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("uploadedBy", "Operação local");
+
+      const response = await fetch("/api/sync/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const payload = (await response.json()) as UploadResult & { message?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.message ?? "Falha ao importar a planilha.");
+      }
+
+      setUploadResult(payload);
+      setSelectedFile(null);
+      await onUploadComplete();
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Falha inesperada ao importar a planilha.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <section className="space-y-5">
@@ -51,10 +104,46 @@ export function InventorySyncTab({ data }: InventorySyncTabProps) {
             </div>
           </div>
 
-          <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#68ddbd] px-4 py-3 text-sm font-semibold text-[#08110f] transition hover:brightness-105">
-            Selecionar arquivo
-            <ArrowRight className="h-4 w-4" />
-          </button>
+          <form onSubmit={handleSubmit} className="mt-5 space-y-3">
+            <label className="block rounded-xl border border-dashed border-[#2a3640] bg-[#0b1116] px-4 py-4 text-sm text-slate-300 transition hover:border-[#68ddbd]/35 hover:bg-[#0f1519]">
+              <span className="mb-1 block font-medium text-white">Arquivo da planilha</span>
+              <span className="block text-xs text-slate-400">CSV, XLSX ou TXT com colunas de unidade, medicamento e estoque.</span>
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls,.txt"
+                onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+                className="mt-3 block w-full text-sm text-slate-300 file:mr-4 file:rounded-lg file:border-0 file:bg-[#68ddbd] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#08110f] hover:file:bg-[#7ae0bc]"
+              />
+            </label>
+
+            {selectedFile && (
+              <p className="text-xs text-slate-400">Selecionado: {selectedFile.name}</p>
+            )}
+
+            {uploadError && (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                {uploadError}
+              </div>
+            )}
+
+            {uploadResult && (
+              <div className="rounded-xl border border-[#68ddbd]/20 bg-[#68ddbd]/10 px-4 py-3 text-sm text-[#7ce4c7]">
+                {uploadResult.message}
+                <div className="mt-1 text-xs text-[#b9f2e0]">
+                  {uploadResult.processedRows} processada(s), {uploadResult.updatedRows} atualizada(s), {uploadResult.createdRows} criada(s), {uploadResult.rejectedRows} rejeitada(s).
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={uploading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#68ddbd] px-4 py-3 text-sm font-semibold text-[#08110f] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {uploading ? "Enviando..." : "Enviar planilha"}
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
         </article>
 
         <article className="rounded-xl border border-[#1b232b] bg-[#0d1117] p-5 shadow-[0_8px_18px_rgba(0,0,0,0.12)]">

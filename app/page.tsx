@@ -37,6 +37,20 @@ export default function Home() {
   const [platformData, setPlatformData] = useState<PlatformSnapshot | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  async function refreshPlatformData() {
+    try {
+      const response = await fetch("/api/platform");
+      if (!response.ok) {
+        throw new Error("Falha ao carregar a plataforma.");
+      }
+
+      const payload = (await response.json()) as PlatformSnapshot;
+      setPlatformData(payload);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "Falha inesperada ao carregar os dados.");
+    }
+  }
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -58,7 +72,7 @@ export default function Home() {
       }
     }
 
-    loadPlatformData();
+    void loadPlatformData();
 
     return () => controller.abort();
   }, []);
@@ -126,8 +140,8 @@ export default function Home() {
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${isActive
-                      ? "bg-[#68ddbd] text-[#07120f]"
-                      : "text-slate-300 hover:bg-[#111b22] hover:text-white"
+                    ? "bg-[#68ddbd] text-[#07120f]"
+                    : "text-slate-300 hover:bg-[#111b22] hover:text-white"
                     }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
@@ -174,7 +188,7 @@ export default function Home() {
           {activeTab === "match" && <TransferTab data={data} />}
           {activeTab === "unidades" && <UnitsTab data={data} />}
           {activeTab === "estoque" && <StockTab data={data} selectedUnitId={selectedUnitId} />}
-          {activeTab === "sincronizar" && <InventorySyncTab data={data} />}
+          {activeTab === "sincronizar" && <InventorySyncTab data={data} onUploadComplete={refreshPlatformData} />}
           {activeTab === "compras" && <PurchasesTab data={data} />}
         </main>
       </div>

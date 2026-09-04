@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ArrowLeftRight, Plus, X, CheckCircle, Clock, AlertTriangle, MapPin, Building2, PackageCheck, ShieldAlert } from "lucide-react";
 import type { Transfer } from "@/data/mock-transfers";
 import type { PlatformSnapshot } from "@/lib/platform-types";
@@ -74,46 +74,44 @@ export function TransferTab({ data }: TransferTabProps) {
       location: unitsById.get(s.unitId)?.location ?? "Local",
     }));
 
-  const matchCandidates = useMemo<MatchCandidate[]>(() => {
-    return excessItems
-      .flatMap((source) => {
-        return shortageItems
-          .filter(
-            (destination) =>
-              destination.medicineId === source.medicineId &&
-              destination.unitId !== source.unitId &&
-              source.companyName !== destination.companyName,
-          )
-          .map((destination) => {
-            const transferableQty = Math.min(
-              source.currentStock - source.forecastConsumption,
-              destination.forecastConsumption - destination.currentStock,
-            );
+  const matchCandidates: MatchCandidate[] = excessItems
+    .flatMap((source) => {
+      return shortageItems
+        .filter(
+          (destination) =>
+            destination.medicineId === source.medicineId &&
+            destination.unitId !== source.unitId &&
+            source.companyName !== destination.companyName,
+        )
+        .map((destination) => {
+          const transferableQty = Math.min(
+            source.currentStock - source.forecastConsumption,
+            destination.forecastConsumption - destination.currentStock,
+          );
 
-            return {
-              id: `${source.unitId}-${destination.unitId}-${source.medicineId}`,
-              sourceUnitId: source.unitId,
-              sourceUnit: source.unitName,
-              sourceCompany: source.companyName,
-              sourceLocation: source.location,
-              sourceHas: source.medicineName,
-              sourceAvailableQty: Math.max(0, source.currentStock - source.forecastConsumption),
-              destinationUnitId: destination.unitId,
-              destinationUnit: destination.unitName,
-              destinationCompany: destination.companyName,
-              destinationLocation: destination.location,
-              destinationNeeds: destination.medicineName,
-              destinationNeedQty: Math.max(0, destination.forecastConsumption - destination.currentStock),
-              medicineName: source.medicineName,
-              medicineId: source.medicineId,
-              transferableQty: Math.max(0, transferableQty),
-              score: Math.min(98, 72 + Math.round((transferableQty / 30) * 18)),
-            };
-          });
-      })
-      .filter((candidate) => candidate.transferableQty > 0)
-      .slice(0, 6);
-  }, [excessItems, shortageItems]);
+          return {
+            id: `${source.unitId}-${destination.unitId}-${source.medicineId}`,
+            sourceUnitId: source.unitId,
+            sourceUnit: source.unitName,
+            sourceCompany: source.companyName,
+            sourceLocation: source.location,
+            sourceHas: source.medicineName,
+            sourceAvailableQty: Math.max(0, source.currentStock - source.forecastConsumption),
+            destinationUnitId: destination.unitId,
+            destinationUnit: destination.unitName,
+            destinationCompany: destination.companyName,
+            destinationLocation: destination.location,
+            destinationNeeds: destination.medicineName,
+            destinationNeedQty: Math.max(0, destination.forecastConsumption - destination.currentStock),
+            medicineName: source.medicineName,
+            medicineId: source.medicineId,
+            transferableQty: Math.max(0, transferableQty),
+            score: Math.min(98, 72 + Math.round((transferableQty / 30) * 18)),
+          };
+        });
+    })
+    .filter((candidate) => candidate.transferableQty > 0)
+    .slice(0, 6);
 
   function handleDecision(candidateId: string, decision: MatchDecision) {
     setMatchDecisions((prev) => ({ ...prev, [candidateId]: decision }));
@@ -295,8 +293,8 @@ export function TransferTab({ data }: TransferTabProps) {
                   <button
                     onClick={() => handleDecision(candidate.id, "accepted")}
                     className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${decision === "accepted"
-                        ? "bg-[#68ddbd] text-[#08110f] shadow-[0_8px_18px_rgba(104,221,189,0.18)]"
-                        : "border border-[#68ddbd]/30 bg-[#68ddbd]/10 text-[#68ddbd] hover:bg-[#68ddbd]/15"
+                      ? "bg-[#68ddbd] text-[#08110f] shadow-[0_8px_18px_rgba(104,221,189,0.18)]"
+                      : "border border-[#68ddbd]/30 bg-[#68ddbd]/10 text-[#68ddbd] hover:bg-[#68ddbd]/15"
                       }`}
                   >
                     Aceitar
@@ -304,8 +302,8 @@ export function TransferTab({ data }: TransferTabProps) {
                   <button
                     onClick={() => handleDecision(candidate.id, "rejected")}
                     className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${decision === "rejected"
-                        ? "bg-red-500 text-white shadow-[0_8px_18px_rgba(239,68,68,0.18)]"
-                        : "border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/15"
+                      ? "bg-red-500 text-white shadow-[0_8px_18px_rgba(239,68,68,0.18)]"
+                      : "border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/15"
                       }`}
                   >
                     Negar
@@ -313,8 +311,8 @@ export function TransferTab({ data }: TransferTabProps) {
                   <button
                     onClick={() => handleDecision(candidate.id, "ignored")}
                     className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition ${decision === "ignored"
-                        ? "bg-slate-600 text-white"
-                        : "border border-slate-500/30 bg-[#101821] text-slate-300 hover:bg-[#171f27]"
+                      ? "bg-slate-600 text-white"
+                      : "border border-slate-500/30 bg-[#101821] text-slate-300 hover:bg-[#171f27]"
                       }`}
                   >
                     Ignorar

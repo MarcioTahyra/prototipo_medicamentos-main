@@ -22,6 +22,16 @@ export type SyncJob = {
     message: string;
 };
 
+export type SpreadsheetImportResult = {
+    job: SyncJob;
+    processedRows: number;
+    updatedRows: number;
+    createdRows: number;
+    rejectedRows: number;
+    totalRows: number;
+    message: string;
+};
+
 export type DashboardMetrics = {
     totalFinancialRisk: number;
     criticalShortageAlerts: number;
